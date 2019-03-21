@@ -1,4 +1,4 @@
-;;; init.el --- Personal emacs configuration of Samuel Tonini
+;;; init.el --- Personal  configuration of Samuel Tonini
 
 ;; Copyright © 2014-2016 Samuel Tonini
 ;;
@@ -113,8 +113,8 @@
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-;; (load-theme 'ujelly t)
-(load-theme 'adwaita t)
+(load-theme 'ujelly t)
+;; (load-theme 'adwaita t)
 
 ;; utf-8 all the things
 (set-terminal-coding-system 'utf-8)
@@ -176,7 +176,7 @@
 (use-package ido
   :config
   (setq ido-enable-flex-matching t)
-  (ido-everywhere t)
+  ;; (ido-everywhere t) ;; disabled due to conflit with helm-mode
   (ido-mode 1))
 
 (use-package hl-line
@@ -409,20 +409,20 @@
   :config
   (helm-projectile-on))
 
-(use-package elixir-mode
-  :load-path "~/Projects/emacs-elixir/"
-  :config (progn
-	    (defun my-elixir-do-end-close-action (id action context)
-	      (when (eq action 'insert)
-		(newline-and-indent)
-		(forward-line -1)
-		(indent-according-to-mode)))
+;; (use-package elixir-mode
+;;   :load-path "~/Projects/emacs-elixir/"
+;;   :config (progn
+;; 	    (defun my-elixir-do-end-close-action (id action context)
+;; 	      (when (eq action 'insert)
+;; 		(newline-and-indent)
+;; 		(forward-line -1)
+;; 		(indent-according-to-mode)))
 
-	    (sp-with-modes '(elixir-mode)
-	      (sp-local-pair "do" "end"
-			     :when '(("SPC" "RET"))
-			     :post-handlers '(:add my-elixir-do-end-close-action)
-			     :actions '(insert)))))
+;; 	    (sp-with-modes '(elixir-mode)
+;; 	      (sp-local-pair "do" "end"
+;; 			     :when '(("SPC" "RET"))
+;; 			     :post-handlers '(:add my-elixir-do-end-close-action)
+;; 			     :actions '(insert)))))
 
 (use-package yasnippet
   :ensure t
@@ -432,74 +432,74 @@
   (yas-global-mode 1)
   :diminish (yas-minor-mode . " YS"))
 
-(use-package alchemist
-  :defer 1
-  :load-path "~/Projects/alchemist.el/"
-  :bind (:map alchemist-iex-mode-map
-	      ("C-d" . windmove-right)
-	 :map alchemist-mode-map
-	      ("M-w" . alchemist-goto-list-symbol-definitions))
-  :config (progn
-	    (setq alchemist-goto-elixir-source-dir "~/Projects/elixir/")
-	    (setq alchemist-goto-erlang-source-dir "~/Projects/otp/")
-	    (defun tonini-alchemist-mode-hook ()
-	      (tester-init-test-run #'alchemist-mix-test-file "_test.exs$")
-	      (tester-init-test-suite-run #'alchemist-mix-test))
-            (add-hook 'alchemist-mode-hook 'tonini-alchemist-mode-hook)
+;; (use-package alchemist
+;;   :defer 1
+;;   :load-path "~/Projects/alchemist.el/"
+;;   :bind (:map alchemist-iex-mode-map
+;; 	      ("C-d" . windmove-right)
+;; 	 :map alchemist-mode-map
+;; 	      ("M-w" . alchemist-goto-list-symbol-definitions))
+;;   :config (progn
+;; 	    (setq alchemist-goto-elixir-source-dir "~/Projects/elixir/")
+;; 	    (setq alchemist-goto-erlang-source-dir "~/Projects/otp/")
+;; 	    (defun tonini-alchemist-mode-hook ()
+;; 	      (tester-init-test-run #'alchemist-mix-test-file "_test.exs$")
+;; 	      (tester-init-test-suite-run #'alchemist-mix-test))
+;;             (add-hook 'alchemist-mode-hook 'tonini-alchemist-mode-hook)
 
-	    ;; Display alchemist buffers always at the bottom
-	    ;; Source: http://www.lunaryorn.com/2015/04/29/the-power-of-display-buffer-alist.html
-	    (add-to-list 'display-buffer-alist
-			 `(,(rx bos (or "*alchemist test report*"
-					"*alchemist mix*"
-					"*alchemist help*"
-					"*alchemist elixir*"
-					"*alchemist elixirc*"))
-			   (display-buffer-reuse-window
-			    display-buffer-in-side-window)
-			   (reusable-frames . visible)
-			   (side            . right)
-			   (window-width   . 0.5)))))
+;; 	    ;; Display alchemist buffers always at the bottom
+;; 	    ;; Source: http://www.lunaryorn.com/2015/04/29/the-power-of-display-buffer-alist.html
+;; 	    (add-to-list 'display-buffer-alist
+;; 			 `(,(rx bos (or "*alchemist test report*"
+;; 					"*alchemist mix*"
+;; 					"*alchemist help*"
+;; 					"*alchemist elixir*"
+;; 					"*alchemist elixirc*"))
+;; 			   (display-buffer-reuse-window
+;; 			    display-buffer-in-side-window)
+;; 			   (reusable-frames . visible)
+;; 			   (side            . right)
+;; 			   (window-width   . 0.5)))))
 
-(use-package erlang
-  :ensure t
-  :bind (:map erlang-mode-map ("M-," . alchemist-goto-jump-back))
-  :config
-  (setq erlang-indent-level 2))
+;; (use-package erlang
+;;   :ensure t
+;;   :bind (:map erlang-mode-map ("M-," . alchemist-goto-jump-back))
+;;   :config
+;;   (setq erlang-indent-level 2))
 
-(use-package enh-ruby-mode
-  :ensure t
-  :defer t
-  :mode (("\\.rb\\'"       . enh-ruby-mode)
-         ("\\.ru\\'"       . enh-ruby-mode)
-         ("\\.jbuilder\\'" . enh-ruby-mode)
-         ("\\.gemspec\\'"  . enh-ruby-mode)
-         ("\\.rake\\'"     . enh-ruby-mode)
-         ("Rakefile\\'"    . enh-ruby-mode)
-         ("Gemfile\\'"     . enh-ruby-mode)
-         ("Guardfile\\'"   . enh-ruby-mode)
-         ("Capfile\\'"     . enh-ruby-mode)
-         ("Vagrantfile\\'" . enh-ruby-mode))
-  :config (progn
-            (setq enh-ruby-indent-level 2
-                  enh-ruby-deep-indent-paren nil
-                  enh-ruby-bounce-deep-indent t
-                  enh-ruby-hanging-indent-level 2)
-            (setq ruby-insert-encoding-magic-comment nil)))
+;; (use-package enh-ruby-mode
+;;   :ensure t
+;;   :defer t
+;;   :mode (("\\.rb\\'"       . enh-ruby-mode)
+;;          ("\\.ru\\'"       . enh-ruby-mode)
+;;          ("\\.jbuilder\\'" . enh-ruby-mode)
+;;          ("\\.gemspec\\'"  . enh-ruby-mode)
+;;          ("\\.rake\\'"     . enh-ruby-mode)
+;;          ("Rakefile\\'"    . enh-ruby-mode)
+;;          ("Gemfile\\'"     . enh-ruby-mode)
+;;          ("Guardfile\\'"   . enh-ruby-mode)
+;;          ("Capfile\\'"     . enh-ruby-mode)
+;;          ("Vagrantfile\\'" . enh-ruby-mode))
+;;   :config (progn
+;;             (setq enh-ruby-indent-level 2
+;;                   enh-ruby-deep-indent-paren nil
+;;                   enh-ruby-bounce-deep-indent t
+;;                   enh-ruby-hanging-indent-level 2)
+;;             (setq ruby-insert-encoding-magic-comment nil)))
 
-(use-package rubocop
-  :ensure t
-  :defer t
-  :init (add-hook 'ruby-mode-hook 'rubocop-mode))
+;; (use-package rubocop
+;;   :ensure t
+;;   :defer t
+;;   :init (add-hook 'ruby-mode-hook 'rubocop-mode))
 
-(use-package rspec-mode
-  :ensure t
-  :defer t
-  :config (progn
-            (defun rspec-ruby-mode-hook ()
-              (tester-init-test-run #'rspec-run-single-file "_spec.rb$")
-              (tester-init-test-suite-run #'rake-test))
-            (add-hook 'enh-ruby-mode-hook 'rspec-ruby-mode-hook)))
+;; (use-package rspec-mode
+;;   :ensure t
+;;   :defer t
+;;   :config (progn
+;;             (defun rspec-ruby-mode-hook ()
+;;               (tester-init-test-run #'rspec-run-single-file "_spec.rb$")
+;;               (tester-init-test-suite-run #'rake-test))
+;;             (add-hook 'enh-ruby-mode-hook 'rspec-ruby-mode-hook)))
 
 (use-package rbenv
   :ensure t
@@ -622,6 +622,8 @@
   :ensure t
   :defer 5
   :config
+  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++17")))
+  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c17")))
   (global-flycheck-mode 1)
   :diminish (flycheck-mode))
 
@@ -681,6 +683,33 @@
   :ensure t
   :mode ("\\.md\\'" . markdown-mode))
 
+;;; alifarazz mods
+;; C[pp] stuff
+(use-package cmake-mode
+  :ensure t
+    :mode ("CMake.Lists.txt" . cmake-mode))
+
+(use-package ggtags
+  :ensure t
+  :config (add-hook 'c-mode-hook 'c++-mode-hook))
+
+(use-package clang-format :ensure t)
+
+;; lsp and ccls for C[pp]
+(use-package lsp-mode :ensure t :commands lsp)
+(use-package lsp-ui :ensure t :commands lsp-ui-mode)
+(use-package company-lsp :ensure t :commands company-lsp)
+(use-package ccls
+  :ensure t
+  :config (setq ccls-executable "/usr/bin/ccls")
+  :hook ((c-mode c++-mode objc-mode) .
+         (lambda () (require 'ccls) (lsp))))
+
+;; support for the rest of cpp files
+(dolist (mode (list ;'("\\.h\\'" . c++-mode)
+               '("\\.hpp\\'" . c++-mode)
+               '("\\.cc\\'" . c++-mode)))
+  (add-to-list 'auto-mode-alist mode))
 
 (provide 'init)
 
