@@ -1,4 +1,4 @@
-;;; init.el --- Personal  configuration of Samuel Tonini
+;;;; init.el --- Personal  configuration of Samuel Tonini
 ;; Copyright © 2014-2016 Samuel Tonini
 ;;
 ;; Author: Samuel Tonini <tonini.samuel@gmail.com>
@@ -7,7 +7,7 @@
 
 ;; This file is not part of GNU Emacs.
 
-;; This program is free software: you can redistribute it and/or modify
+;; This program is free software: you can redistribute it and/or modify 
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
@@ -51,7 +51,7 @@
 (defconst tonini-custom-file (locate-user-emacs-file "customize.el")
   "File used to store settings from Customization UI.")
 
-(setq temporary-file-directory (expand-file-name "~/.emacs.d/tmp"))
+(setq temporary-file-directory (expand-file-name "~/.emacs.d/tmp"));
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
@@ -60,6 +60,17 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'tonini-utils)
 (require 'tonini-keybindings)
+; enbale Xah fly keys
+(use-package xah-fly-keys
+  :ensure t
+  :delight xah
+  :config
+  (xah-fly-keys-set-layout "qwerty")
+  (define-key xah-fly-key-map (kbd "C-o") 'helm-find-files)
+  (define-key xah-fly-key-map (kbd "/") 'set-mark-command)
+  (define-key xah-fly-key-map (kbd ";") 'xah-end-of-line-or-block))
+(xah-fly-keys 1) ;; enable'm
+
 
 (defun my-minibuffer-setup-hook ()
   (setq gc-cons-threshold most-positive-fixnum))
@@ -84,6 +95,7 @@
 
 (set-default 'truncate-lines t)
 (set-default 'indent-tabs-mode nil)
+(global-visual-line-mode)
 
 (delete-selection-mode 1)
 (transient-mark-mode 1)
@@ -94,7 +106,7 @@
       inhibit-startup-screen t
       echo-keystrokes 0.1
       linum-format " %d"
-      initial-scratch-message "Howdy Sam!\n")
+      initial-scratch-message "Hi fa! >.<\n")
 (fset 'yes-or-no-p #'y-or-n-p)
 ;; Opt out from the startup message in the echo area by simply disabling this
 ;; ridiculously bizarre thing entirely.
@@ -103,9 +115,10 @@
 (global-linum-mode)
 
 (set-face-attribute 'default nil
-                    :family "Source Code Pro" :height 160)
+                    :family "Hack" :height 90)
 (set-face-attribute 'variable-pitch nil
-                    :family "Fira Sans" :height 140 :weight 'regular)
+                    :family "Source Code Pro" :height 90 :weight 'regular)
+
 
 (set-frame-parameter nil 'fullscreen 'fullboth)
 
@@ -160,9 +173,10 @@
   :init
   (smartparens-global-mode)
   (show-smartparens-global-mode)
-  (dolist (hook '(inferior-emacs-lisp-mode-hook
-                  emacs-lisp-mode-hook))
-    (add-hook hook #'smartparens-strict-mode))
+  ;; (dolist (hook '(inferior-emacs-lisp-mode-hook
+  ;;                 emacs-lisp-mode-hook))
+  ;; (add-hook hook #'smartparens-strict-mode))
+
   :config
   (require 'smartparens-config)
   (setq sp-autoskip-closing-pair 'always)
@@ -733,29 +747,29 @@
   :delight
   :config  (add-hook 'clojure-mode-hook #'cider-mode))
 
-(use-package parinfer
-  :ensure t
-  :delight
-  :bind
-  (("C-," . parinfer-toggle-mode))
-  :init
-  (progn
-    (setq parinfer-extensions
-          '(defaults       ; should be included.
-             pretty-parens))  ; different paren styles for different modes.
-    ;; evil           ; If you use Evil.
-    ;; lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
-    ;; paredit        ; Introduce some paredit commands.
-    ;; smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-    ;; smart-yank   ; Yank behavior depend on mode.
+;; (use-package parinfer
+;;   :ensure t
+;;   :delight
+;;   :bind
+;;   (("C-," . parinfer-toggle-mode))
+;;   :init
+;;   (progn
+;;     (setq parinfer-extensions
+;;           '(defaults       ; should be included.
+;;              pretty-parens))  ; different paren styles for different modes.
+;;     ;; evil           ; If you use Evil.
+;;     ;; lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+;;     ;; paredit        ; Introduce some paredit commands.
+;;     ;; smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+;;     ;; smart-yank   ; Yank behavior depend on mode.
     
-    (add-hook 'clojure-mode-hook #'parinfer-mode)
-    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'common-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'scheme-mode-hook #'parinfer-mode)
-    (add-hook 'lisp-mode-hook #'parinfer-mode)))
+;;     (add-hook 'clojure-mode-hook #'parinfer-mode)
+;;     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+;;     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
+;;     (add-hook 'scheme-mode-hook #'parinfer-mode)
+;;     (add-hook 'lisp-mode-hook #'parinfer-mode)))
 
-;;; General stuff
+;;; General
 ;; auto update packages
 (use-package auto-package-update
   :ensure t
@@ -768,6 +782,10 @@
 (use-package hungry-delete
   :ensure t
   :commands global-hungry-delete-mode)
+
+(use-package which-key
+  :ensure t)
+(which-key-mode)
 
 (provide 'init)
 
