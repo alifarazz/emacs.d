@@ -1,5 +1,4 @@
 ;;; init.el --- Personal  configuration of Samuel Tonini
-
 ;; Copyright © 2014-2016 Samuel Tonini
 ;;
 ;; Author: Samuel Tonini <tonini.samuel@gmail.com>
@@ -168,9 +167,9 @@
   (require 'smartparens-config)
   (setq sp-autoskip-closing-pair 'always)
   :bind
-  (:map smartparens-mode-map
-	("C-c s u" . sp-unwrap-sexp)
-	("C-c s w" . sp-rewrap-sexp))
+  (:map smartparens-mode-map)
+  ("C-c s u" . sp-unwrap-sexp)
+  ("C-c s w" . sp-rewrap-sexp)
   :diminish (smartparens-mode))
 
 (use-package ido
@@ -209,12 +208,12 @@
   :config
   (progn
     (delete 'company-dabbrev company-backends)
-    (setq company-tooltip-align-annotations t
-	  company-tooltip-minimum-width 27
-	  company-idle-delay 0.3
-	  company-tooltip-limit 10
-	  company-minimum-prefix-length 3
-	  company-tooltip-flip-when-above t))
+    (setq company-tooltip-align-annotations t)
+    company-tooltip-minimum-width 27
+    company-idle-delay 0.3
+    company-tooltip-limit 10
+    company-minimum-prefix-length 3
+    company-tooltip-flip-when-above t)
   :bind (:map company-active-map
               ("M-k" . company-select-next)
               ("M-i" . company-select-previous)
@@ -248,16 +247,16 @@
               ("C-i" . helm-execute-persistent-action))
   :config (progn
             (setq helm-buffers-fuzzy-matching t)
-            (helm-mode 1)
-	    (setq helm-split-window-in-side-p           t
-		  helm-buffers-fuzzy-matching           t
-		  helm-move-to-line-cycle-in-source     t
-		  helm-ff-search-library-in-sexp        t
-		  helm-ff-file-name-history-use-recentf t
-		  helm-ag-fuzzy-match                   t)
+            (helm-mode 1))
+  (setq helm-split-window-in-side-p           t
+        helm-buffers-fuzzy-matching           t
+        helm-move-to-line-cycle-in-source     t
+        helm-ff-search-library-in-sexp        t
+        helm-ff-file-name-history-use-recentf t
+        helm-ag-fuzzy-match                   t)
 
-	    (substitute-key-definition 'find-tag 'helm-etags-select global-map)
-	    (setq projectile-completion-system 'helm))
+  (substitute-key-definition 'find-tag 'helm-etags-select global-map)
+  (setq projectile-completion-system 'helm)
   ;; Display helm buffers always at the bottom
   ;; Source: http://www.lunaryorn.com/2015/04/29/the-power-of-display-buffer-alist.html
   (add-to-list 'display-buffer-alist
@@ -387,7 +386,7 @@
   :defer 1
   :bind (("C-p s" . projectile-persp-switch-project))
   :config
-  (persp-mode)
+  (persp-mode))
   ;; (defun persp-format-name (name)
   ;;   "Format the perspective name given by NAME for display in `persp-modestring'."
   ;;   (let ((string-name (format "%s" name)))
@@ -402,7 +401,7 @@
 ;; 	    (append '("[")
 ;; 		    (persp-intersperse (mapcar 'persp-format-name (persp-names)) "")
 ;; 		    '("]")))))
-  )
+  
 
 (use-package helm-projectile
   :ensure t
@@ -504,9 +503,9 @@
 (use-package rbenv
   :ensure t
   :defer t
-  :init (progn
-	  (setq rbenv-show-active-ruby-in-modeline nil)
-	  (global-rbenv-mode))
+  :init (progn)
+    (setq rbenv-show-active-ruby-in-modeline nil)
+    (global-rbenv-mode)
   :config (progn
             (global-rbenv-mode)
             (add-hook 'enh-ruby-mode-hook 'rbenv-use-corresponding)))
@@ -592,8 +591,8 @@
   :mode (("\\.js\\'" . js2-mode)
          ("\\.js.erb\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode))
-  :bind (:map js2-mode-map
-	      ("M-j" . backward-char))
+  :bind (:map js2-mode-map)
+        ("M-j" . backward-char)
   :config (setq js2-basic-offset 2))
 
 (use-package typescript-mode
@@ -632,8 +631,8 @@
   :config
   (progn
     (drag-stuff-global-mode 1)
-    (drag-stuff-define-keys)
-    ))
+    (drag-stuff-define-keys)))
+    
 
 (use-package magit
   :ensure t
@@ -661,8 +660,8 @@
 
 (use-package emmet-mode
   :ensure t
-  :bind (:map emmet-mode-keymap
-	      ("M-e" . emmet-expand-line))
+  :bind (:map emmet-mode-keymap)
+        ("M-e" . emmet-expand-line)
   :config (add-hook 'web-mode-hook 'emmet-mode))
 
 (use-package sass-mode
@@ -687,7 +686,7 @@
 ;; C[pp] stuff
 (use-package cmake-mode
   :ensure t
-    :mode ("CMake.Lists.txt" . cmake-mode))
+  :mode ("CMake.Lists.txt\\'" . cmake-mode))
 
 (use-package ggtags
   :ensure t
@@ -706,15 +705,29 @@
          (lambda () (require 'ccls) (lsp))))
 
 ;; support for the rest of cpp files
-(dolist (mode (list ;'("\\.h\\'" . c++-mode)
+(dolist (mode (list '("\\.h\\'" . c++-mode)
                     '("\\.hpp\\'" . c++-mode)
                     '("\\.cc\\'" . c++-mode)))
-         (add-to-list 'auto-mode-alist mode))
+  (add-to-list 'auto-mode-alist mode))
+ 
+
+;; Hydra config
+(use-package hydra
+  :ensure t)
+
+;; (use-package use-package-hydra
+;;   :ensure t)
+
+(use-package cider-hydra
+  :ensure t
+  :after hydra
+  :config (add-hook 'clojure-mode-hook #'cider-hydra-mode))
+
+
 ;; Clojure
 (use-package clojure-mode
-  :ensure t
-  :mode ("\\.clj\\'" . clojure-mode))
-
+  :ensure t)
+  
 (use-package cider
   :ensure t
   :delight
@@ -722,19 +735,20 @@
 
 (use-package parinfer
   :ensure t
+  :delight
   :bind
   (("C-," . parinfer-toggle-mode))
   :init
   (progn
     (setq parinfer-extensions
           '(defaults       ; should be included.
-            pretty-parens  ; different paren styles for different modes.
-            ;; evil           ; If you use Evil.
-            ;; lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
-            ;; paredit        ; Introduce some paredit commands.
-            ;; smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-            ;; smart-yank   ; Yank behavior depend on mode.
-            )) 
+             pretty-parens))  ; different paren styles for different modes.
+    ;; evil           ; If you use Evil.
+    ;; lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+    ;; paredit        ; Introduce some paredit commands.
+    ;; smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+    ;; smart-yank   ; Yank behavior depend on mode.
+    
     (add-hook 'clojure-mode-hook #'parinfer-mode)
     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
