@@ -221,4 +221,10 @@ file of a buffer in an external program."
           (add-to-list 'symbol-names name)
           (add-to-list 'name-and-pos (cons name position))))))))
 
+;;;###autoload
+(defun open-init-file ()
+  "Open the init file."
+  (interactive)
+  (find-file user-init-file))
+
 (provide 'tonini-utils)

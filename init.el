@@ -1,10 +1,4 @@
-;;;; init.el --- Personal  configuration of Samuel Tonini
-;; Copyright © 2014-2016 Samuel Tonini
-;;
-;; Author: Samuel Tonini <tonini.samuel@gmail.com>
-;; Maintainer: Samuel Tonini <tonini.samuel@gmail.com>
-;; URL: http://www.github.com/tonini/emacs.d
-
+;;;; init.el --- Personal  configuration of alifarazz
 ;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or modify 
@@ -22,7 +16,7 @@
 
 ;;; Commentary:
 
-;; Personal Emacs configuration of Samuel Tonini
+;; Based on personal Emacs configuration of Samuel Tonini
 
 ;;; Code:
 
@@ -35,6 +29,7 @@
 ;; Bootstrap `use-package'
 (require 'package)
 (setq package-enable-at-startup nil)
+(setq use-package-always-ensure t)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
@@ -45,10 +40,10 @@
 
 (require 'bind-key)
 
-(use-package diminish :ensure t)
+(use-package diminish )
 
 ;; Customization
-(defconst tonini-custom-file (locate-user-emacs-file "customize.el")
+(defconst tonini-custom-file (locate-user-emacs-file "customize.el") ;
   "File used to store settings from Customization UI.")
 
 (setq temporary-file-directory (expand-file-name "~/.emacs.d/tmp"));
@@ -60,24 +55,27 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'tonini-utils)
 (require 'tonini-keybindings)
-; enbale Xah fly keys
+;; enbale Xah fly keys
 (use-package xah-fly-keys
-  :ensure t
+  
   :delight xah
+  :diminish (xah-fly-keys)
+  ;; :init
   :config
   (xah-fly-keys-set-layout "qwerty")
   (define-key xah-fly-key-map (kbd "C-o") 'helm-find-files)
   (define-key xah-fly-key-map (kbd "/") 'set-mark-command)
-  (define-key xah-fly-key-map (kbd ";") 'xah-end-of-line-or-block))
+  (define-key xah-fly-key-map (kbd ";") 'xah-end-of-line-or-block)
+  (define-key xah-fly-dot-keymap (kbd "t") 'neotree-toggle))
 (xah-fly-keys 1) ;; enable'm
 
 
 (defun my-minibuffer-setup-hook ()
-  (setq gc-cons-threshold most-positive-fixnum))
-
-(defun my-minibuffer-exit-hook ()
-  (setq gc-cons-threshold 800000))
-
+   (setq gc-cons-threshold most-positive-fixnum))
+;;(defun my-minibuffer-setup-hook ())
+ (defun my-minibuffer-exit-hook ()
+   (setq gc-cons-threshold 800000))
+;(defun my-minibuffer-exit-hook ())
 (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
@@ -95,7 +93,7 @@
 
 (set-default 'truncate-lines t)
 (set-default 'indent-tabs-mode nil)
-(global-visual-line-mode)
+;; (global-visual-line-mode)
 
 (delete-selection-mode 1)
 (transient-mark-mode 1)
@@ -119,20 +117,27 @@
 (set-face-attribute 'variable-pitch nil
                     :family "Source Code Pro" :height 90 :weight 'regular)
 
+;; (set-frame-parameter nil 'fullscreen 'fullboth)
 
-(set-frame-parameter nil 'fullscreen 'fullboth)
+;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(load-theme 'ujelly t)
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+;; (load-theme 'misterioso t)
 ;; (load-theme 'adwaita t)
+(load-theme 'ample t)
 
-;; utf-8 all the things
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
+;; UTF-8 please
+(setq locale-coding-system 'utf-8) ; pretty
+(set-terminal-coding-system 'utf-8) ; pretty
+(set-keyboard-coding-system 'utf-8) ; pretty
+(set-selection-coding-system 'utf-8) ; please
+(setq-default buffer-file-coding-system 'utf-8-unix)
+(setq-default default-buffer-file-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
+(when (eq system-type 'windows-nt)
+  (set-clipboard-coding-system 'utf-16le-dos))
+
 
 ;; System setup
 
@@ -142,7 +147,28 @@
 ;;
 ;; I have a modern machine ;)
 ;;
-(setq gc-cons-threshold 20000000)
+;; (setq gc-cons-threshold 20000000)
+
+;;;;; Startup optimizations
+;;;;;; Set garbage collection threshold
+;; From https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
+(setq gc-cons-threshold-original gc-cons-threshold)
+(setq gc-cons-threshold (* 1024 1024 100))
+;;;;;; Set file-name-handler-alist
+;; Also from https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
+(setq file-name-handler-alist-original file-name-handler-alist)
+(setq file-name-handler-alist nil)
+;;;;;; Set deferred timer to reset them
+(run-with-idle-timer
+ 5 nil
+ (lambda ()
+   (setq gc-cons-threshold gc-cons-threshold-original)
+   (setq file-name-handler-alist file-name-handler-alist-original)
+   (makunbound 'gc-cons-threshold-original)
+   (makunbound 'file-name-handler-alist-original)
+   (message "gc-cons-threshold and file-name-handler-alist restored")))
+;;;;; End of startup optimizations
+
 
 (setq delete-old-versions t
       make-backup-files nil
@@ -153,7 +179,7 @@
 (server-start) ;; Allow this Emacs process to be a server for client processes.
 
 (use-package page-break-lines           ; Turn page breaks into lines
-  :ensure t
+  
   :init (global-page-break-lines-mode)
   :diminish page-break-lines-mode)
 
@@ -169,7 +195,7 @@
   :init (load tonini-custom-file 'no-error 'no-message))
 
 (use-package smartparens
-  :ensure t
+  
   :init
   (smartparens-global-mode)
   (show-smartparens-global-mode)
@@ -196,7 +222,7 @@
   :init (global-hl-line-mode 1))
 
 (use-package rainbow-delimiters
-  :ensure t
+  
   :defer t
   :init
   (dolist (hook '(text-mode-hook prog-mode-hook emacs-lisp-mode-hook))
@@ -206,18 +232,18 @@
   :init (global-hi-lock-mode))
 
 (use-package highlight-numbers
-  :ensure t
+  
   :defer t
   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
 (use-package rainbow-mode
-  :ensure t
+  
   :bind (("C-c t r" . rainbow-mode))
   :config (add-hook 'css-mode-hook #'rainbow-mode)
   :diminish (rainbow-mode))
 
 (use-package company                    ; Graphical (auto-)completion
-  :ensure t
+  
   :init (global-company-mode)
   :config
   (progn
@@ -235,7 +261,7 @@
   :diminish company-mode)
 
 (use-package ag
-  :ensure t
+  
   :commands (ag ag-regexp ag-project))
 
 (use-package tester
@@ -243,7 +269,7 @@
   :commands (tester-run-test-file tester-run-test-suite))
 
 (use-package helm
-  :ensure t
+  
   :bind (("M-a" . helm-M-x)
          ("C-x C-f" . helm-find-files)
          ("C-x f" . helm-recentf)
@@ -281,7 +307,7 @@
                  (window-height   . 0.4)))
   :diminish (helm-mode))
 (use-package helm-descbinds
-  :ensure t
+  
   :bind ("C-h b" . helm-descbinds))
 (use-package helm-files
   :bind (:map helm-find-files-map
@@ -293,7 +319,7 @@
               ("M-H" . nil)
               ("M-v" . yank)))
 (use-package helm-swoop
-  :ensure t
+  
   :bind (("M-m" . helm-swoop)
          ("M-M" . helm-swoop-back-to-last-point))
   :init
@@ -315,7 +341,7 @@
                'helm-source-info-emacs))
 
 (use-package helm-flycheck              ; Helm frontend for Flycheck errors
-  :ensure t
+  
   :defer t
   :after flycheck)
 
@@ -336,7 +362,7 @@
 
 
 (use-package multiple-cursors           ; Edit text with multiple cursors
-  :ensure t
+  
   :bind (("C-c o <SPC>" . mc/vertical-align-with-space)
          ("C-c o a"     . mc/vertical-align)
          ("C-c o e"     . mc/mark-more-like-this-extended)
@@ -372,7 +398,7 @@
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :disabled t
-  :ensure t
+  
   :defer t
   :init (add-hook 'ibuffer-hook
                   (lambda ()
@@ -381,7 +407,7 @@
                       (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package projectile
-  :ensure t
+  
   :bind (("C-x p" . projectile-persp-switch-project))
   :config
   (setq projectile-completion-system 'helm)
@@ -391,14 +417,13 @@
   :diminish (projectile-mode))
 
 (use-package ibuffer-projectile         ; Group buffers by Projectile project
-  :ensure t
+  
   :defer t
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (use-package persp-projectile
-  :ensure t
   :defer 1
-  :bind (("C-p s" . projectile-persp-switch-project))
+  ;; :bind (("C-p s" . projectile-persp-switch-project))
   :config
   (persp-mode))
   ;; (defun persp-format-name (name)
@@ -418,7 +443,7 @@
   
 
 (use-package helm-projectile
-  :ensure t
+  
   :config
   (helm-projectile-on))
 
@@ -438,11 +463,12 @@
 ;; 			     :actions '(insert)))))
 
 (use-package yasnippet
-  :ensure t
+  
   :defer t
+  :init
+  (yas-global-mode +1)
   :config
   (setq yas-snippet-dirs "~/.emacs.d/snippets")
-  (yas-global-mode 1)
   :diminish (yas-minor-mode . " YS"))
 
 ;; (use-package alchemist
@@ -475,13 +501,13 @@
 ;; 			   (window-width   . 0.5)))))
 
 ;; (use-package erlang
-;;   :ensure t
+;;   
 ;;   :bind (:map erlang-mode-map ("M-," . alchemist-goto-jump-back))
 ;;   :config
 ;;   (setq erlang-indent-level 2))
 
 ;; (use-package enh-ruby-mode
-;;   :ensure t
+;;   
 ;;   :defer t
 ;;   :mode (("\\.rb\\'"       . enh-ruby-mode)
 ;;          ("\\.ru\\'"       . enh-ruby-mode)
@@ -501,12 +527,12 @@
 ;;             (setq ruby-insert-encoding-magic-comment nil)))
 
 ;; (use-package rubocop
-;;   :ensure t
+;;   
 ;;   :defer t
 ;;   :init (add-hook 'ruby-mode-hook 'rubocop-mode))
 
 ;; (use-package rspec-mode
-;;   :ensure t
+;;   
 ;;   :defer t
 ;;   :config (progn
 ;;             (defun rspec-ruby-mode-hook ()
@@ -515,7 +541,7 @@
 ;;             (add-hook 'enh-ruby-mode-hook 'rspec-ruby-mode-hook)))
 
 (use-package rbenv
-  :ensure t
+  
   :defer t
   :init (progn)
     (setq rbenv-show-active-ruby-in-modeline nil)
@@ -524,11 +550,11 @@
             (global-rbenv-mode)
             (add-hook 'enh-ruby-mode-hook 'rbenv-use-corresponding)))
 
-(use-package f
-  :ensure t)
+(use-package f)
 
 ;;; OS X support
 (use-package ns-win                     ; OS X window support
+  :ensure f
   :defer t
   :if (eq system-type 'darwin)
   :config
@@ -543,7 +569,7 @@
 
 ;;; Environment fixup
 (use-package exec-path-from-shell
-  :ensure t
+  
   :config
   (progn
     (exec-path-from-shell-initialize)
@@ -557,10 +583,10 @@
           (add-to-list 'Info-directory-list dir))))))
 
 (use-package default-text-scale
-  :ensure t)
+  )
 
 (use-package overseer
-  :ensure t
+  
   :init
   (progn
     (defun test-emacs-lisp-hook ()
@@ -569,15 +595,16 @@
     (add-hook 'overseer-mode-hook 'test-emacs-lisp-hook)))
 
 (use-package karma
-  :ensure t
+  
   :init)
 
 (use-package elisp-slime-nav
-  :ensure t
+  
   :init (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode)
   :diminish elisp-slime-nav-mode)
 
 (use-package emacs-lisp-mode
+  :ensure f
   :defer t
   :interpreter ("emacs" . emacs-lisp-mode)
   :bind (:map emacs-lisp-mode-map
@@ -588,11 +615,11 @@
   :diminish (emacs-lisp-mode . "EL"))
 
 (use-package cask-mode
-  :ensure t
+  
   :defer t)
 
 (use-package macrostep
-  :ensure t
+  
   :after elisp-mode
   :bind (:map emacs-lisp-mode-map ("C-c m x" . macrostep-expand)
               :map lisp-interaction-mode-map ("C-c m x" . macrostep-expand)))
@@ -601,7 +628,7 @@
   :after elisp-mode)
 
 (use-package js2-mode
-  :ensure t
+  
   :mode (("\\.js\\'" . js2-mode)
          ("\\.js.erb\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode))
@@ -610,16 +637,16 @@
   :config (setq js2-basic-offset 2))
 
 (use-package typescript-mode
-  :ensure t
+  
   :config (setq typescript-indent-level 2))
 
 (use-package coffee-mode
-  :ensure t
+  
   :mode (("\\.coffee\\'" . coffee-mode)
          ("\\.coffee.erb\\'" . coffee-mode)))
 
 (use-package js2-refactor
-  :ensure t
+  
   :after js2-mode
   :init
   (add-hook 'js2-mode-hook 'js2-refactor-mode)
@@ -628,28 +655,29 @@
 
 (use-package company-tern
   :disabled t
-  :ensure t
+  
   :after company)
 
 (use-package flycheck
-  :ensure t
+  
   :defer 5
-  :config
-  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++17")))
-  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c17")))
-  (global-flycheck-mode 1)
+  ;; :config
+  ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++17")))
+  ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c17")))
+  ;; (global-flycheck-mode 1)
   :diminish (flycheck-mode))
 
 (use-package drag-stuff
-  :ensure t
+  
   :config
   (progn
     (drag-stuff-global-mode 1)
-    (drag-stuff-define-keys)))
+    (drag-stuff-define-keys))
+  :diminish (drag-stuff))
     
 
 (use-package magit
-  :ensure t
+  
   :defer 2
   :bind (("C-x g" . magit-status))
   :config
@@ -657,11 +685,11 @@
     (delete 'Git vc-handled-backends)))
 
 (use-package yaml-mode
-  :ensure t
+  
   :mode ("\\.ya?ml\\'" . yaml-mode))
 
 (use-package web-mode
-  :ensure t
+  
   :mode (("\\.erb\\'" . web-mode)
          ("\\.mustache\\'" . web-mode)
          ("\\.html?\\'" . web-mode)
@@ -673,19 +701,19 @@
                   web-mode-code-indent-offset 2)))
 
 (use-package emmet-mode
-  :ensure t
+  
   :bind (:map emmet-mode-keymap)
         ("M-e" . emmet-expand-line)
   :config (add-hook 'web-mode-hook 'emmet-mode))
 
 (use-package sass-mode
-  :ensure t)
+  )
 
 (use-package scss-mode
-  :ensure t)
+  )
 
 (use-package whitespace-cleanup-mode
-  :ensure t
+  
   :bind (("C-c t c" . whitespace-cleanup-mode)
          ("C-c x w" . whitespace-cleanup))
   :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
@@ -693,62 +721,99 @@
   :diminish (whitespace-cleanup-mode))
 
 (use-package markdown-mode
-  :ensure t
+  
   :mode ("\\.md\\'" . markdown-mode))
 
 ;;; alifarazz mods
+;; IDE-like stuff
+(use-package neotree
+  :config
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (setq neo-smart-open t)
+  (setq neo-theme 'icons))
+
+(use-package all-the-icons
+  )
+
+
 ;; C[pp] stuff
 (use-package cmake-mode
-  :ensure t
+  
   :mode ("CMake.Lists.txt\\'" . cmake-mode))
 
 (use-package ggtags
-  :ensure t
+  
   :config (add-hook 'c-mode-hook 'c++-mode-hook))
 
-(use-package clang-format :ensure t)
+(use-package clang-format )
 
 ;; lsp and ccls for C[pp]
-(use-package lsp-mode :ensure t :commands lsp)
-(use-package lsp-ui :ensure t :commands lsp-ui-mode)
-(use-package company-lsp :ensure t :commands company-lsp)
+(use-package lsp-mode 
+  :config 
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "pyls")
+                    :major-modes '(python-mode)
+                    :server-id 'pyls))
+  (add-hook 'python-mode-hook #'lsp)
+  (setq create-lockfiles nil) ;we will got error "Wrong type argument: sequencep" from `eldoc-message' if `lsp-enable-eldoc' is non-nil
+  (setq lsp-message-project-root-warning t) ;avoid popup warning buffer if lsp can't found root directory (such as edit simple *.py file)
+  (setq lsp-enable-eldoc nil) ;we will got error "Error from the Language Server: FileNotFoundError" if `create-lockfiles' is non-nil
+  )
+;; :commands lsp)
+
+(use-package lsp-ui 
+  :config
+  (setq lsp-ui-sideline-ignore-duplicate t)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(use-package company-lsp
+  :config
+  (push 'company-lsp company-backends))
+
+(use-package lsp-python-ms
+  :config 
+  (add-hook 'python-mode-hook #'lsp-python-enable))
+
 (use-package ccls
-  :ensure t
   :config (setq ccls-executable "/usr/bin/ccls")
   :hook ((c-mode c++-mode objc-mode) .
          (lambda () (require 'ccls) (lsp))))
 
 ;; support for the rest of cpp files
-(dolist (mode (list '("\\.h\\'" . c++-mode)
+(dolist (mode (list '("\\.h\\'" . c-mode)
                     '("\\.hpp\\'" . c++-mode)
+                    '("\\.hxx\\'" . c++-mode)
+                    '("\\.hh\\'" . c++-mode)
                     '("\\.cc\\'" . c++-mode)))
   (add-to-list 'auto-mode-alist mode))
+;; disable flymake on python
+(add-hook 'python-mode-hook (lambda () (setq flymake-mode -1)))
  
 
 ;; Hydra config
 (use-package hydra
-  :ensure t)
+  )
 
-;; (use-package use-package-hydra
-;;   :ensure t)
+(use-package use-package-hydra
+  )
 
 (use-package cider-hydra
-  :ensure t
+  
   :after hydra
   :config (add-hook 'clojure-mode-hook #'cider-hydra-mode))
 
 
 ;; Clojure
 (use-package clojure-mode
-  :ensure t)
+  )
   
 (use-package cider
-  :ensure t
+  
   :delight
   :config  (add-hook 'clojure-mode-hook #'cider-mode))
 
 ;; (use-package parinfer
-;;   :ensure t
+;;   
 ;;   :delight
 ;;   :bind
 ;;   (("C-," . parinfer-toggle-mode))
@@ -771,21 +836,46 @@
 
 ;;; General
 ;; auto update packages
-(use-package auto-package-update
-  :ensure t
-  :config
-  (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe))
+;(use-package auto-package-update
+;  
+;  :config
+;  (setq auto-package-update-delete-old-versions t)
+;  (setq auto-package-update-hide-results t)
+;  (auto-package-update-maybe))
 
 ;; enable hungry-delete on all modes
 (use-package hungry-delete
-  :ensure t
+  
   :commands global-hungry-delete-mode)
 
 (use-package which-key
-  :ensure t)
+  )
 (which-key-mode)
+
+
+;; theme
+;; (use-package ample-theme
+;;   ;; :init (progn (load-theme 'ample t t)
+;;   ;;              (load-theme 'ample-flat t t)
+;;   ;;              (load-theme 'ample-light t t)
+;;   ;;              (enable-theme 'ample-light))
+;;   :defer t
+;;   )
+;; (use-package flatland-theme
+;;   :init (progn (load-theme 'flatland t t)
+;;                (enable-theme 'flatland))
+;;   :defer t
+;;   )
+;; (use-package ujelly-theme
+;;   :init (progn (load-theme 'ujelly t t)
+;;                (enable-theme 'ujelly))
+;;   :defer t
+;; )
+
+
+(use-package waf-mode
+  :mode ("wscript\\'" . cmake-mode)
+)
 
 (provide 'init)
 
