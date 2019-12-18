@@ -57,7 +57,6 @@
 (require 'tonini-keybindings)
 ;; enbale Xah fly keys
 (use-package xah-fly-keys
-
   :delight xah
   :diminish (xah-fly-keys)
   ;; :init
@@ -68,7 +67,6 @@
   (define-key xah-fly-key-map (kbd ";") 'xah-end-of-line-or-block)
   (define-key xah-fly-dot-keymap (kbd "t") 'treemacs))
 (xah-fly-keys 1) ;; enable'm
-
 
 (defun my-minibuffer-setup-hook ()
    (setq gc-cons-threshold most-positive-fixnum))
@@ -94,7 +92,7 @@
 (set-default 'truncate-lines t)
 (set-default 'indent-tabs-mode nil)
 ;; (global-visual-line-mode)
-
+(global-subword-mode t)
 (delete-selection-mode 1)
 (transient-mark-mode 1)
 ;; No blinking and beeping, no startup screen, no scratch message and short
@@ -179,7 +177,6 @@
 (server-start) ;; Allow this Emacs process to be a server for client processes.
 
 (use-package page-break-lines           ; Turn page breaks into lines
-
   :init (global-page-break-lines-mode)
   :diminish page-break-lines-mode)
 
@@ -195,7 +192,6 @@
   :init (load tonini-custom-file 'no-error 'no-message))
 
 (use-package smartparens
-
   :init
   (smartparens-global-mode)
   (show-smartparens-global-mode)
@@ -222,7 +218,6 @@
   :init (global-hl-line-mode 1))
 
 (use-package rainbow-delimiters
-
   :defer t
   :init
   (dolist (hook '(text-mode-hook prog-mode-hook emacs-lisp-mode-hook))
@@ -237,7 +232,6 @@
   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
 (use-package rainbow-mode
-
   :bind (("C-c t r" . rainbow-mode))
   :config (add-hook 'css-mode-hook #'rainbow-mode)
   :diminish (rainbow-mode))
@@ -259,7 +253,7 @@
               ("TAB" . company-complete-selection))
   :diminish company-mode)
 
-;; alifarzz: with icons!!
+;;; alifarzz: with icons!! ;; acutally, NO!
 ;(use-package company-box
 ;  :hook (company-mode . company-box-mode))
 
@@ -271,7 +265,6 @@
   :commands (tester-run-test-file tester-run-test-suite))
 
 (use-package helm
-
   :bind (("M-a" . helm-M-x)
          ("C-x C-f" . helm-find-files)
          ("C-x f" . helm-recentf)
@@ -321,7 +314,6 @@
               ("M-H" . nil)
               ("M-v" . yank)))
 (use-package helm-swoop
-
   :bind (("M-m" . helm-swoop)
          ("M-M" . helm-swoop-back-to-last-point))
   :init
@@ -343,7 +335,6 @@
                'helm-source-info-emacs))
 
 (use-package helm-flycheck              ; Helm frontend for Flycheck errors
-
   :defer t
   :after flycheck)
 
@@ -364,7 +355,6 @@
 
 
 (use-package multiple-cursors           ; Edit text with multiple cursors
-
   :bind (("C-c o <SPC>" . mc/vertical-align-with-space)
          ("C-c o a"     . mc/vertical-align)
          ("C-c o e"     . mc/mark-more-like-this-extended)
@@ -400,7 +390,6 @@
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :disabled t
-
   :defer t
   :init (add-hook 'ibuffer-hook
                   (lambda ()
@@ -409,7 +398,6 @@
                       (ibuffer-do-sort-by-alphabetic)))))
 
 (use-package projectile
-
   :bind (("C-x p" . projectile-persp-switch-project))
   :config
   (setq projectile-completion-system 'helm)
@@ -419,7 +407,6 @@
   :diminish (projectile-mode))
 
 (use-package ibuffer-projectile         ; Group buffers by Projectile project
-
   :defer t
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
@@ -445,7 +432,6 @@
 
 
 (use-package helm-projectile
-
   :config
   (helm-projectile-on))
 
@@ -465,7 +451,6 @@
 ;; 			     :actions '(insert)))))
 
 (use-package yasnippet
-
   :defer t
   :init
   (yas-global-mode +1)
@@ -543,7 +528,6 @@
 ;;             (add-hook 'enh-ruby-mode-hook 'rspec-ruby-mode-hook)))
 
 (use-package rbenv
-
   :defer t
   :init (progn)
     (setq rbenv-show-active-ruby-in-modeline nil)
@@ -554,24 +538,23 @@
 
 (use-package f)
 
-;;; OS X support
-(use-package ns-win                     ; OS X window support
-  :ensure f
-  :defer t
-  :if (eq system-type 'darwin)
-  :config
-  (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
-                                        ; workspace
-        mac-option-modifier 'meta       ; Option is simply the natural Meta
-        mac-command-modifier 'meta      ; But command is a lot easier to hit
-        mac-right-command-modifier 'left
-        mac-right-option-modifier 'none ; Keep right option for accented input
-        ;; Just in case we ever need these keys
-        mac-function-modifier 'hyper))
+;; ;;; OS X support
+;; (use-package ns-win                     ; OS X window support
+;;   :ensure f
+;;   :defer t
+;;   :if (eq system-type 'darwin)
+;;   :config
+;;   (setq ns-pop-up-frames nil            ; Don't pop up new frames from the
+;;                                         ; workspace
+;;         mac-option-modifier 'meta       ; Option is simply the natural Meta
+;;         mac-command-modifier 'meta      ; But command is a lot easier to hit
+;;         mac-right-command-modifier 'left
+;;         mac-right-option-modifier 'none ; Keep right option for accented input
+;;         ;; Just in case we ever need these keys
+;;         mac-function-modifier 'hyper))
 
 ;;; Environment fixup
 (use-package exec-path-from-shell
-
   :config
   (progn
     (exec-path-from-shell-initialize)
@@ -588,7 +571,6 @@
   )
 
 (use-package overseer
-
   :init
   (progn
     (defun test-emacs-lisp-hook ()
@@ -597,11 +579,9 @@
     (add-hook 'overseer-mode-hook 'test-emacs-lisp-hook)))
 
 (use-package karma
-
   :init)
 
 (use-package elisp-slime-nav
-
   :init (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode)
   :diminish elisp-slime-nav-mode)
 
@@ -617,11 +597,9 @@
   :diminish (emacs-lisp-mode . "EL"))
 
 (use-package cask-mode
-
   :defer t)
 
 (use-package macrostep
-
   :after elisp-mode
   :bind (:map emacs-lisp-mode-map ("C-c m x" . macrostep-expand)
               :map lisp-interaction-mode-map ("C-c m x" . macrostep-expand)))
@@ -630,7 +608,6 @@
   :after elisp-mode)
 
 (use-package js2-mode
-
   :mode (("\\.js\\'" . js2-mode)
          ("\\.js.erb\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode))
@@ -639,16 +616,13 @@
   :config (setq js2-basic-offset 2))
 
 (use-package typescript-mode
-
   :config (setq typescript-indent-level 2))
 
 (use-package coffee-mode
-
   :mode (("\\.coffee\\'" . coffee-mode)
          ("\\.coffee.erb\\'" . coffee-mode)))
 
 (use-package js2-refactor
-
   :after js2-mode
   :init
   (add-hook 'js2-mode-hook 'js2-refactor-mode)
@@ -657,11 +631,9 @@
 
 (use-package company-tern
   :disabled t
-
   :after company)
 
 (use-package flycheck
-
   :defer 5
   ;; :config
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++17")))
@@ -670,7 +642,6 @@
   :diminish (flycheck-mode))
 
 (use-package drag-stuff
-
   :config
   (progn
     (drag-stuff-global-mode 1)
@@ -679,7 +650,6 @@
 
 
 (use-package magit
-
   :defer 2
   :bind (("C-x g" . magit-status))
   :config
@@ -687,11 +657,9 @@
     (delete 'Git vc-handled-backends)))
 
 (use-package yaml-mode
-
   :mode ("\\.ya?ml\\'" . yaml-mode))
 
 (use-package web-mode
-
   :mode (("\\.erb\\'" . web-mode)
          ("\\.mustache\\'" . web-mode)
          ("\\.html?\\'" . web-mode)
@@ -703,7 +671,6 @@
                   web-mode-code-indent-offset 2)))
 
 (use-package emmet-mode
-
   :bind (:map emmet-mode-keymap)
         ("M-e" . emmet-expand-line)
   :config (add-hook 'web-mode-hook 'emmet-mode))
@@ -715,7 +682,6 @@
   )
 
 (use-package whitespace-cleanup-mode
-
   :bind (("C-c t c" . whitespace-cleanup-mode)
          ("C-c x w" . whitespace-cleanup))
   :init (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
@@ -723,7 +689,6 @@
   :diminish (whitespace-cleanup-mode))
 
 (use-package markdown-mode
-
   :mode ("\\.md\\'" . markdown-mode))
 
 ;;; alifarazz mods
@@ -735,7 +700,6 @@
 ;;   (setq neo-smart-open t)
 ;;   (setq neo-theme 'icons))
 ;; (use-package all-the-icons)
-
 (use-package treemacs
   :ensure t
   :defer t
@@ -800,32 +764,37 @@
         ;; ("C-x t C-t" . treemacs-find-file)
         ;; ("C-x t M-t" . treemacs-find-tag)
 ))
-
 ;; (use-package treemacs-evil
 ;;   :after treemacs evil
 ;;   :ensure t)
-
 (use-package treemacs-projectile
   :after treemacs projectile)
-
 (use-package treemacs-icons-dired
-  :after treemacs dired
+  :after treemacs dired  ;; disabled due to a bug in intel's opencl driver triggerd by imagemagick
   :config (treemacs-icons-dired-mode))
-
 (use-package treemacs-magit
   :after treemacs magit)
 
-
 ;; C[pp] stuff
 (use-package cmake-mode
-
   :mode ("CMake.Lists.txt\\'" . cmake-mode))
+;; (use-package ggtags
+;;   :init (add-hook 'c-mode-hook 'c++-mode-hook))
+(use-package clang-format
+  :hook c-mode ;; is cc-mode useless?
+  :bind (:map c-mode-base-map
+              ("C-c f r" . clang-format-region)
+              ("C-c f b" . clang-format-buffer)
+))
+;; (use-package beacon
+;;   :config
+;;   (progn (beacon-mode 1))
+;; )
+(blink-cursor-mode 0)
 
-(use-package ggtags
-
-  :config (add-hook 'c-mode-hook 'c++-mode-hook))
-
-(use-package clang-format )
+;; Multiple cursor incremental search & replace
+(use-package phi-search
+  :bind ("M-%" . phi-replace-query))
 
 ;; lsp for language server stuff
 (use-package lsp-mode
@@ -885,29 +854,31 @@
                     '("\\.hh\\'" . c++-mode)
                     '("\\.cc\\'" . c++-mode)))
   (add-to-list 'auto-mode-alist mode))
+
 ;; disable flymake on python
 ;; (add-hook 'python-mode-hook (lambda () (setq flymake-mode -1)))
 
+;; generic Emacs/Scheme interaction mode
+(use-package geiser
+  :config
+  (setq geiser-active-implementations '(guile chez))
+)
 
 ;; Hydra config
 (use-package hydra
   )
-
 (use-package use-package-hydra
+  :after hydra
   )
-
 (use-package cider-hydra
-
   :after hydra
   :config (add-hook 'clojure-mode-hook #'cider-hydra-mode))
 
 
 ;; Clojure
-(use-package clojure-mode
-  )
+(use-package clojure-mode)
 
 (use-package cider
-
   :delight
   :config  (add-hook 'clojure-mode-hook #'cider-mode))
 
@@ -947,33 +918,38 @@
 ;;   :commands global-hungry-delete-mode)
 
 (use-package which-key
-  )
-(which-key-mode)
+  :config (which-key-mode 1))
 
 
 ;; theme
 (use-package ample-theme
-  :init (progn (load-theme 'ample t t)
-               (load-theme 'ample-flat t t)
-               (load-theme 'ample-light t t)
-               (enable-theme 'ample-flat))
-  :defer t
-  )
-(use-package flatland-theme
-  :init (progn (load-theme 'flatland t t))
-               ;; (enable-theme 'flatland))
-  :defer t
-  )
-(use-package ujelly-theme
-  :init (progn (load-theme 'ujelly t t))
-               ;; (enable-theme 'ujelly))
+  :init (progn
+          (load-theme 'ample t t)
+          (load-theme 'ample-flat t t)
+          (load-theme 'ample-light t t)
+          (enable-theme 'ample-flat))
   :defer t
 )
+;; (use-package flatland-theme
+;;   ;; :init (progn (load-theme 'flatland t t))
+;;   ;;              (enable-theme 'flatland))
+;;   :defer t
+;; )
+;; (use-package ujelly-theme
+;;   ;; :init (progn (load-theme 'ujelly t t))
+;;                ;; (enable-theme 'ujelly))
+;;   :defer t
+;; )
+;; (use-package monokai-pro-theme
+;;   :init (progn (load-theme 'monokai-pro t t)
 
+;;                )
+;;   :defer t
+;; )
 
-(use-package waf-mode
-  :mode ("wscript\\'" . cmake-mode)
-)
+;; (use-package waf-mode
+;;   :mode ("wscript\\'" . cmake-mode)
+;; )
 
 (use-package fish-mode
   :mode ("\\.fish\\'" . markdown-mode)
@@ -982,8 +958,19 @@
 ;; remove trailing white-space
 (use-package simple
   :ensure nil
-  :hook (before-save . delete-trailing-whitespace))
+  :hook
+  (before-save . delete-trailing-whitespace)
+ )
 
+;; for reading epubs.
+(use-package nov
+  :config
+  (push '("\\.epub\\'" . nov-mode) auto-mode-alist)
+)
+
+;; (use-package crystal-mode
+;;   :mode ("\\.cr\\'" . crystal-mode)
+;; )
 
 (provide 'init)
 

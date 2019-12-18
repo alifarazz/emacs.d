@@ -15,8 +15,9 @@
  '(cua-read-only-cursor-color "#859900")
  '(custom-safe-themes
    (quote
-    ("36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "bf798e9e8ff00d4bf2512597f36e5a135ce48e477ce88a0764cfb5d8104e8163" "4138944fbed88c047c9973f68908b36b4153646a045648a22083bd622d1e636d" "c9ddf33b383e74dac7690255dd2c3dfa1961a8e8a1d20e401c6572febef61045" "9b35c097a5025d5da1c97dba45fed027e4fb92faecbd2f89c2a79d2d80975181" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "db05a5e4147343b645d8a04124a7ce6d798940c9c0ba07d3a7c7a9000c9670ab" default)))
+    ("09cadcc2784baa744c6a7c5ebf2a30df59c275414768b0719b800cabd8d1b842" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "bf798e9e8ff00d4bf2512597f36e5a135ce48e477ce88a0764cfb5d8104e8163" "4138944fbed88c047c9973f68908b36b4153646a045648a22083bd622d1e636d" "c9ddf33b383e74dac7690255dd2c3dfa1961a8e8a1d20e401c6572febef61045" "9b35c097a5025d5da1c97dba45fed027e4fb92faecbd2f89c2a79d2d80975181" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "db05a5e4147343b645d8a04124a7ce6d798940c9c0ba07d3a7c7a9000c9670ab" default)))
  '(fci-rule-color "#073642")
+ '(geiser-chez-binary "chez-scheme")
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -47,13 +48,81 @@
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (treemacs-magit treemacs-icons-dired treemacs-projectile treemacs dap-mode shader-mode glsl-mode lsp-python-ms lsp-python cider-hydra waf-mode ujelly-theme flycheck fish-mode use-package-hydra hydra opencl-mode command-log-mode rainbow-mode rainbow-delimiters xah-fly-keys diminish parinfer hungry-delete auto-package-update ccls company-lsp lsp-ui lsp-mode magit elixir-mode cider clang-format ggtags clojure-mode cmake-mode perspective helm-projectile jade-mode scss-mode js2-mode yasnippet projectile multiple-cursors helm helm-core smartparens zenburn-theme zen-burn exec-path-from-shell color-theme-sanityinc-solarized emmet-mode default-text-scale yaml-mode whitespace-cleanup-mode which-key web-mode use-package typescript-mode solarized-theme slim-mode sass-mode rubocop rspec-mode rbenv persp-projectile page-break-lines overseer markdown-mode macrostep karma js2-refactor ibuffer-projectile highlight-numbers helm-swoop helm-flycheck helm-descbinds helm-ag f evil-smartparens erlang enh-ruby-mode elisp-slime-nav drag-stuff company coffee-mode cask-mode beacon ag)))
+    (monokai-pro-theme flatland-theme helm-flycheck helm-flymake helm-flyspell geiser phi-search nov crystal-mode smart-mode-line-powerline-theme treemacs-magit treemacs-icons-dired treemacs-projectile treemacs dap-mode shader-mode glsl-mode lsp-python-ms lsp-python cider-hydra waf-mode ujelly-theme flycheck fish-mode use-package-hydra hydra opencl-mode command-log-mode rainbow-mode rainbow-delimiters xah-fly-keys diminish parinfer hungry-delete auto-package-update ccls company-lsp lsp-ui lsp-mode magit elixir-mode cider clang-format ggtags clojure-mode cmake-mode perspective helm-projectile jade-mode scss-mode js2-mode yasnippet projectile multiple-cursors helm helm-core smartparens zenburn-theme zen-burn exec-path-from-shell color-theme-sanityinc-solarized emmet-mode default-text-scale yaml-mode whitespace-cleanup-mode which-key web-mode use-package typescript-mode solarized-theme slim-mode sass-mode rubocop rspec-mode rbenv persp-projectile page-break-lines overseer markdown-mode macrostep karma js2-refactor ibuffer-projectile highlight-numbers helm-swoop helm-descbinds helm-ag f evil-smartparens erlang enh-ruby-mode elisp-slime-nav drag-stuff company coffee-mode cask-mode beacon ag)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(projectile-globally-ignored-directories
    (quote
     ("vendor/bundle" ".idea" "_build" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" "_build" ".cask" "deps" "node_modules" "lib/elixir/_build")))
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
+ '(sml/mode-width
+   (if
+       (eq
+        (powerline-current-separator)
+        (quote arrow))
+       (quote right)
+     (quote full)))
+ '(sml/pos-id-separator
+   (quote
+    (""
+     (:propertize " " face powerline-active1)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (car powerline-default-separator-dir)))
+                   (quote powerline-active1)
+                   (quote powerline-active2))))
+     (:propertize " " face powerline-active2))))
+ '(sml/pos-minor-modes-separator
+   (quote
+    (""
+     (:propertize " " face powerline-active1)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (cdr powerline-default-separator-dir)))
+                   (quote powerline-active1)
+                   (quote sml/global))))
+     (:propertize " " face sml/global))))
+ '(sml/pre-id-separator
+   (quote
+    (""
+     (:propertize " " face sml/global)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (car powerline-default-separator-dir)))
+                   (quote sml/global)
+                   (quote powerline-active1))))
+     (:propertize " " face powerline-active1))))
+ '(sml/pre-minor-modes-separator
+   (quote
+    (""
+     (:propertize " " face powerline-active2)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (cdr powerline-default-separator-dir)))
+                   (quote powerline-active2)
+                   (quote powerline-active1))))
+     (:propertize " " face powerline-active1))))
+ '(sml/pre-modes-separator (propertize " " (quote face) (quote sml/modes)))
  '(term-default-bg-color "#002b36")
  '(term-default-fg-color "#839496")
  '(tool-bar-mode nil)
