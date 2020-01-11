@@ -110,10 +110,14 @@
 
 (global-linum-mode)
 
+;; (set-face-attribute 'default nil
+;;                     :family "Hack" :height 90)
+;; (set-face-attribute 'variable-pitch nil
+;;                     :family "Source Code Pro Medium" :height 90 :weight 'regular)
 (set-face-attribute 'default nil
-                    :family "Hack" :height 90)
-(set-face-attribute 'variable-pitch nil
                     :family "Source Code Pro" :height 90 :weight 'regular)
+
+
 
 ;; (set-frame-parameter nil 'fullscreen 'fullboth)
 
@@ -254,8 +258,9 @@
   :diminish company-mode)
 
 ;;; alifarzz: with icons!! ;; acutally, NO!
-;(use-package company-box
-;  :hook (company-mode . company-box-mode))
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode)
+;;   :diminish (company-box-mode))
 
 (use-package ag
   :commands (ag ag-regexp ag-project))
@@ -793,21 +798,27 @@
 (blink-cursor-mode 0)
 
 ;; Multiple cursor incremental search & replace
-(use-package phi-search
-  :bind ("M-%" . phi-replace-query))
+;; (use-package phi-search
+;;   :bind ("M-%" . phi-replace-query))
+
 
 ;; lsp for language server stuff
 (use-package lsp-mode
   :config
+  ;; make sure we have lsp-imenu everywhere we have LSP
+  ;; (require 'lsp-imenu)
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection "pyls")
+    (make-lsp-client :new-connection (lsp-stdio-connection "pyls")
                     :major-modes '(python-mode)
                     :server-id 'pyls))
-  (add-hook 'python-mode-hook #'lsp)
+
   (setq create-lockfiles nil) ;we will get error "Wrong type argument: sequencep" from `eldoc-message' if `lsp-enable-eldoc' is non-nil
   (setq lsp-message-project-root-warning t) ;avoid popup warning buffer if lsp can't found root directory (such as edit simple *.py file)
   (setq lsp-enable-eldoc nil) ;we will get error "Error from the Language Server: FileNotFoundError" if `create-lockfiles' is non-nil
-  :commands lsp)
+  ;; :commands lsp
+  )
 
 (use-package lsp-ui
   :config
@@ -831,15 +842,21 @@
     (tooltip-mode 1)))
 
 ;; java stuff
-(use-package lsp-ui)
 (use-package dap-java :ensure nil :after (lsp-java))
 (use-package lsp-java :after lsp
   :config (add-hook 'java-mode-hook 'lsp))
 
-;; language server for python
-(use-package lsp-python-ms
+;; python stuff
+(use-package lsp-python
+  :ensure t
   :config
-  (add-hook 'python-mode-hook #'lsp-python-enable))
+  (add-hook 'python-mode-hook (lambda ()
+                                (pyvenv-mode t)
+                                (lsp-python-enable))))
+(use-package pyvenv
+  :config
+  (setenv "WORKON_HOME" (expand-file-name "~/.local/share/virtualenvs/"))
+  (pyvenv-mode t))
 
 ;; language server for C[pp]
 (use-package ccls
@@ -854,6 +871,7 @@
                     '("\\.hh\\'" . c++-mode)
                     '("\\.cc\\'" . c++-mode)))
   (add-to-list 'auto-mode-alist mode))
+
 
 ;; disable flymake on python
 ;; (add-hook 'python-mode-hook (lambda () (setq flymake-mode -1)))
