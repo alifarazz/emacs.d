@@ -56,20 +56,28 @@
 (require 'tonini-utils)
 (require 'tonini-keybindings)
 ;; enbale Xah fly keys
+
 (use-package xah-fly-keys
   :delight xah
   :diminish (xah-fly-keys)
   ;; :init
   :config
+  (defun xah-fly-keys-command-mode-on ()
+    (interactive)
+    (setq cursor-type 'box)
+    (define-key xah-fly-key-map (kbd ",") 'ace-window)
+    (define-key xah-fly-key-map (kbd "`") 'treemacs-select-window))
+  (add-hook 'xah-fly-command-mode-activate-hook 'xah-fly-keys-command-mode-on)
   (xah-fly-keys-set-layout "qwerty")
   (define-key xah-fly-key-map (kbd "C-o") 'helm-find-files)
   (define-key xah-fly-key-map (kbd "/") 'set-mark-command)
   (define-key xah-fly-key-map (kbd ";") 'xah-end-of-line-or-block)
-  (define-key xah-fly-dot-keymap (kbd "t") 'treemacs))
+  (define-key xah-fly-dot-keymap (kbd "t") 'treemacs)
+  (define-key key-translation-map (kbd "ESC") (kbd "C-g")))
 (xah-fly-keys 1) ;; enable'm
 
 (defun my-minibuffer-setup-hook ()
-   (setq gc-cons-threshold most-positive-fixnum))
+  (setq gc-cons-threshold most-positive-fixnum))
 ;;(defun my-minibuffer-setup-hook ())
  (defun my-minibuffer-exit-hook ()
    (setq gc-cons-threshold 800000))
@@ -103,7 +111,10 @@
       echo-keystrokes 0.1
       linum-format " %d"
       initial-scratch-message "Hi fa! >.<\n")
-(fset 'yes-or-no-p #'y-or-n-p)
+;; (yes-or-no-p #'y-or-n-p)
+;; ('yes-or-no-p #'y-or-n-p)
+;; (yes-or-no-p #'y-or-n-p)
+
 ;; Opt out from the startup message in the echo area by simply disabling this
 ;; ridiculously bizarre thing entirely.
 (fset 'display-startup-echo-area-message #'ignore)
@@ -114,9 +125,12 @@
 ;;                     :family "Hack" :height 90)
 ;; (set-face-attribute 'variable-pitch nil
 ;;                     :family "Source Code Pro Medium" :height 90 :weight 'regular)
+;; (set-face-attribute 'default nil
+;;                     :family "Source Code Pro" :height 90 :weight 'regular)
 (set-face-attribute 'default nil
-                    :family "Source Code Pro" :height 90 :weight 'regular)
-
+                    :family "Hack" :height 100 :weight 'regular)
+(set-face-attribute 'variable-pitch nil
+                    :family "Hack" :height 100 :weight 'regular)
 
 
 ;; (set-frame-parameter nil 'fullscreen 'fullboth)
@@ -199,7 +213,7 @@
   :init
   (smartparens-global-mode)
   (show-smartparens-global-mode)
-  ;; (dolist (hook '(inferior-emacs-lisp-mode-hook
+  ;; (dolist (hook '(inferior-emacs-mode-hook
   ;;                 emacs-lisp-mode-hook))
   ;; (add-hook hook #'smartparens-strict-mode))
 
@@ -704,7 +718,7 @@
 ;;   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 ;;   (setq neo-smart-open t)
 ;;   (setq neo-theme 'icons))
-;; (use-package all-the-icons)
+(use-package all-the-icons)
 (use-package treemacs
   :ensure t
   :defer t
@@ -722,7 +736,7 @@
           treemacs-follow-after-init             t
           treemacs-git-command-pipe              ""
           treemacs-goto-tag-strategy             'refetch-index
-          treemacs-indentation                   2
+          treemacs-indentation                   1
           treemacs-indentation-string            " "
           treemacs-is-never-other-window         nil
           treemacs-max-git-entries               5000
@@ -745,7 +759,7 @@
           treemacs-space-between-root-nodes      t
           treemacs-tag-follow-cleanup            t
           treemacs-tag-follow-delay              1.5
-          treemacs-width                         30)
+          treemacs-width                         25)
 
     ;; The default width and height of the icons is 22 pixels. If you are
     ;; using a Hi-DPI display, uncomment this to double the icon size.
@@ -804,28 +818,50 @@
 
 ;; lsp for language server stuff
 (use-package lsp-mode
+  :hook ((c-mode
+          c-or-c++-mode
+          python-mode) . lsp-deferred)
+  :custom
+  (lsp-enable-xref t)
+  (lsp-prefer-flymake nil)
+  (create-lockfiles nil) ;we will get error "Wrong type argument: sequencep" from `eldoc-message' if `lsp-enable-eldoc' is non-nil
+  (lsp-message-project-root-warning t) ;avoid popup warning buffer if lsp can't found root directory (such as edit simple *.py file)
+  (lsp-enable-eldoc nil) ;we will get error "Error from the Language Server: FileNotFoundError" if `create-lockfiles' is non-nil
   :config
   ;; make sure we have lsp-imenu everywhere we have LSP
   ;; (require 'lsp-imenu)
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
 
   (lsp-register-client
-    (make-lsp-client :new-connection (lsp-stdio-connection "pyls")
+   (make-lsp-client :new-connection (lsp-stdio-connection "pyls")
                     :major-modes '(python-mode)
                     :server-id 'pyls))
-
-  (setq create-lockfiles nil) ;we will get error "Wrong type argument: sequencep" from `eldoc-message' if `lsp-enable-eldoc' is non-nil
-  (setq lsp-message-project-root-warning t) ;avoid popup warning buffer if lsp can't found root directory (such as edit simple *.py file)
-  (setq lsp-enable-eldoc nil) ;we will get error "Error from the Language Server: FileNotFoundError" if `create-lockfiles' is non-nil
-  ;; :commands lsp
-  )
+  :commands lsp)
 
 (use-package lsp-ui
-  :config
-  ;; (setq lsp-ui-sideline-ignore-duplicate t)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  :after flycheck lsp-mode
+  :hook (lsp-mode . lsp-ui-mode)
+  ;; :config                    ;
+  ;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  :custom
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-doc-border (face-foreground 'default))
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-flycheck-enable t)
+  (lsp-ui-flycheck-list-position 'right)
+  (lsp-ui-flycheck-live-reporting t)
+  (lsp-ui-peek-enable nil)
+  :commands lsp-ui-mode)
 
 (use-package company-lsp
+  :after company lsp-mode
+  :custom
+  (company-transformers nil)
+  (company-lsp-async t)
+  (company-lsp-cache-candidates nil)
+  (company-lsp-enable-snippet t)
+  :commands company-lsp
   :config
   (push 'company-lsp company-backends))
 
@@ -834,7 +870,7 @@
   :config
   (progn
     (dap-mode 1)
-    (dap-ui-mode 1)
+    ;; (dap-ui-mode 1)
     ;; enables mouse hover support
     (dap-tooltip-mode 1)
     ;; use tooltips for mouse hover
@@ -847,16 +883,17 @@
   :config (add-hook 'java-mode-hook 'lsp))
 
 ;; python stuff
-(use-package lsp-python
+(use-package lsp-python-ms
   :ensure t
   :config
   (add-hook 'python-mode-hook (lambda ()
                                 (pyvenv-mode t)
-                                (lsp-python-enable))))
+                                (lsp))))
 (use-package pyvenv
   :config
   (setenv "WORKON_HOME" (expand-file-name "~/.local/share/virtualenvs/"))
-  (pyvenv-mode t))
+  ;; (pyvenv-mode t)
+)
 
 ;; language server for C[pp]
 (use-package ccls
@@ -883,11 +920,9 @@
 )
 
 ;; Hydra config
-(use-package hydra
-  )
+(use-package hydra)
 (use-package use-package-hydra
-  :after hydra
-  )
+  :after hydra)
 (use-package cider-hydra
   :after hydra
   :config (add-hook 'clojure-mode-hook #'cider-hydra-mode))
@@ -895,10 +930,17 @@
 
 ;; Clojure
 (use-package clojure-mode)
-
 (use-package cider
   :delight
   :config  (add-hook 'clojure-mode-hook #'cider-mode))
+
+;; Octave
+(push '("\\.m\\'" . octave-mode) auto-mode-alist)
+;; (use-package simple-octave
+;;   :ensure nil
+;;   :hook
+;;   (push '("\\.m\\'" . octave-mode) auto-mode-alist))
+
 
 ;; (use-package parinfer
 ;;
@@ -939,15 +981,34 @@
   :config (which-key-mode 1))
 
 
+(use-package doom-themes
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-opera t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+
+  ;; ;; Enable custom neotree theme (all-the-icons must be installed!)
+  ;; (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
 ;; theme
-(use-package ample-theme
-  :init (progn
-          (load-theme 'ample t t)
-          (load-theme 'ample-flat t t)
-          (load-theme 'ample-light t t)
-          (enable-theme 'ample-flat))
-  :defer t
-)
+;; (use-package ample-theme
+;;   :init (progn
+;;           (load-theme 'ample t t)
+;;           (load-theme 'ample-flat t t)
+;;           (load-theme 'ample-light t t)
+;;           (enable-theme 'ample-flat))
+;;   :defer t
+;; )
 ;; (use-package flatland-theme
 ;;   ;; :init (progn (load-theme 'flatland t t))
 ;;   ;;              (enable-theme 'flatland))
@@ -970,7 +1031,7 @@
 ;; )
 
 (use-package fish-mode
-  :mode ("\\.fish\\'" . markdown-mode)
+  :mode ("\\.fish\\'" . fish-mode)
 )
 
 ;; remove trailing white-space
